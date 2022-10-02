@@ -64,17 +64,29 @@ class Enemy(GameSprite):
             self.rect.x += self.speed
 
 class Wall(sprite.Sprite):
-    def __init__(self, x, y, width, height, color = (255, 113, 31)):
+    def __init__(self, img, x, y, width, height):
         super().__init__()
         self.img = Surface((width, height))
         self.rect = self.img.get_rect()
-        self.img.fill(color)
+        self.img_width = 50
+        self.img_height = 50
+        self.picture = transform.scale(image.load(img), (50, 50))
+        self.rect = self.img.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.width = width
         self.height = height
+        
+
+
     def draw(self):
+        if self.width > self.height:      
+            self.img_width = 0     
+            while self.width > self.img_width:
+                self.img.blit(self.img, (self.img_width, 0))
+                self.img_width += 50
         window.blit(self.img, self.rect)
+
 
 class Treasure(GameSprite):
     def __init__(self):
@@ -82,16 +94,16 @@ class Treasure(GameSprite):
 
 
 
-bg = transform.scale(image.load("background.jpg"), (WIDTH, HEIGHT))
+bg = transform.scale(image.load("ground.png"), (WIDTH, HEIGHT))
 
 player = Player()
 cyborg = Enemy(350, 300)
 treasure = Treasure()
 
-wall1 = Wall(50, 50, 20, 500)
-wall2 = Wall(70, 50, 770, 20)
-wall3 = Wall(300, 70, 20, 150)
-wall4 = Wall(840, 50, 20, 500)
+wall1 = Wall("wall.png", 50, 50, 20, 500)
+wall2 = Wall("wall.png", 70, 50, 770, 20)
+wall3 = Wall("wall.png", 300, 70, 20, 150)
+wall4 = Wall("wall.png", 840, 50, 20, 500)
 walls = [wall1, wall2, wall3, wall4]
 
 
