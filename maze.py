@@ -63,9 +63,36 @@ class Enemy(GameSprite):
         else:
             self.rect.x += self.speed
 
+<<<<<<< HEAD
 class Wall(GameSprite):
     def __init__(self, x, y, width=50, height=50, color = (255, 113, 31)):
         super().__init__("wall.png", x, y, width, height)
+
+=======
+class Wall(sprite.Sprite):
+    def __init__(self, img, x, y, width, height):
+        super().__init__()
+        self.img = Surface((width, height))
+        self.rect = self.img.get_rect()
+        self.img_width = 50
+        self.img_height = 50
+        self.picture = transform.scale(image.load(img), (50, 50))
+        self.rect = self.img.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = width
+        self.height = height
+        
+
+
+    def draw(self):
+        if self.width > self.height:      
+            self.img_width = 0     
+            while self.width > self.img_width:
+                self.img.blit(self.img, (self.img_width, 0))
+                self.img_width += 50
+        window.blit(self.img, self.rect)
+>>>>>>> 4b23f12b1c65419f09de62f50edfaa5a967f17e5
 
 
 class Treasure(GameSprite):
@@ -79,6 +106,7 @@ bg = transform.scale(image.load("ground.png"), (WIDTH, HEIGHT))
 player = Player()
 cyborg = Enemy(350, 300)
 
+<<<<<<< HEAD
 
 level = [
     "WWWWWWWWWWWWWWWWWWWW",
@@ -113,6 +141,13 @@ for row in level:
         x += 50
     y += 50
     x = 0
+=======
+wall1 = Wall("wall.png", 50, 50, 20, 500)
+wall2 = Wall("wall.png", 70, 50, 770, 20)
+wall3 = Wall("wall.png", 300, 70, 20, 150)
+wall4 = Wall("wall.png", 840, 50, 20, 500)
+walls = [wall1, wall2, wall3, wall4]
+>>>>>>> 4b23f12b1c65419f09de62f50edfaa5a967f17e5
 
 
 mixer.music.load("jungles.ogg")
