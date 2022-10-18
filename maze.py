@@ -18,15 +18,15 @@ result = font1.render("", True, (0, 255, 0))
 class GameSprite(sprite.Sprite):
     def __init__(self, image_name, x, y, width, height):
         super().__init__()
-        self.img = transform.scale(image.load(image_name), (width, height))
-        self.rect = self.img.get_rect()
+        self.image = transform.scale(image.load(image_name), (width, height))
+        self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.width = width
         self.height = height
 
     def draw(self):
-        window.blit(self.img, self.rect)
+        window.blit(self.image, self.rect)
 
 class Player(GameSprite):
     def __init__(self):
@@ -63,36 +63,56 @@ class Enemy(GameSprite):
         else:
             self.rect.x += self.speed
 
-class Wall(sprite.Sprite):
-    def __init__(self, x, y, width, height, color = (255, 113, 31)):
-        super().__init__()
-        self.img = Surface((width, height))
-        self.rect = self.img.get_rect()
-        self.img.fill(color)
-        self.rect.x = x
-        self.rect.y = y
-        self.width = width
-        self.height = height
-    def draw(self):
-        window.blit(self.img, self.rect)
+class Wall(GameSprite):
+    def __init__(self, x, y, width=50, height=50, color = (255, 113, 31)):
+        super().__init__("wall.png", x, y, width, height)
+
 
 class Treasure(GameSprite):
-    def __init__(self):
-        super().__init__("treasure.png", WIDTH - 120, HEIGHT - 100, 75, 75)
+    def __init__(self, x, y):
+        super().__init__("treasure.png", x, y, 75, 75)
 
 
 
-bg = transform.scale(image.load("background.jpg"), (WIDTH, HEIGHT))
+bg = transform.scale(image.load("ground.png"), (WIDTH, HEIGHT))
 
 player = Player()
 cyborg = Enemy(350, 300)
-treasure = Treasure()
 
-wall1 = Wall(50, 50, 20, 500)
-wall2 = Wall(70, 50, 770, 20)
-wall3 = Wall(300, 70, 20, 150)
-wall4 = Wall(840, 50, 20, 500)
-walls = [wall1, wall2, wall3, wall4]
+
+level = [
+    "WWWWWWWWWWWWWWWWWWWW",
+    "W                  W",
+    "W         WWWWWW   W",
+    "W   WWWW       W   W",
+    "W   W        WWWW  W",
+    "W WWW  WWWW        W",
+    "W   W     W W      W",
+    "W   W     W   WWW WW",
+    "W   WWW WWW   W W  W",
+    "W     W   W   W W  W",
+    "WWW   W   WWWWW W  W",
+    "W W      WW        W",
+    "W W   WWWW   WWW   W",
+    "W     W    T   W   W",
+    "WWWWWWWWWWWWWWWWWWWW",
+]
+ 
+# Parse the level string above. W = wall, E = exit
+x = y = 0
+walls = sprite.Group()
+treasure = Treasure(0, 0)
+
+for row in level:
+    for col in row:
+        if col == "W":           
+            walls.add(Wall(x, y))
+        if col == "T":
+            treasure.rect.x = x
+            treasure.rect.y = y
+        x += 50
+    y += 50
+    x = 0
 
 
 mixer.music.load("jungles.ogg")
@@ -143,8 +163,7 @@ while run:
         window.blit(bg, (0,0))
         player.draw()
         cyborg.draw()
-        for wall in walls:
-            wall.draw()
+        walls.draw(window)
         treasure.draw()
     else:
         window.blit(result, (300, 300))
