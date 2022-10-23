@@ -30,7 +30,7 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self):
-        super().__init__("hero.png", 200, 200, 75, 75)
+        super().__init__("hero.png", 200, 200, 50, 50)
         self.speed = 5
         self.hp = 100
 
@@ -193,6 +193,9 @@ while run:
             result = font1.render("YOU WIN", True, (0, 255, 0))
             finish = True
             win_sound.play()
+        if sprite.collide_rect(player, cyborg):
+            result = font1.render("YOU LOSE", True, (255, 0, 0))
+            finish = True
 
 
         window.blit(bg, (0,0))
