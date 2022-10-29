@@ -30,7 +30,7 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self):
-        super().__init__("hero.png", 200, 200, 75, 75)
+        super().__init__("hero.png", 200, 200, 60, 60)
         self.speed = 5
         self.hp = 100
 
@@ -63,41 +63,16 @@ class Enemy(GameSprite):
         else:
             self.rect.x += self.speed
 
-<<<<<<< HEAD
+
 class Wall(GameSprite):
-    def __init__(self, x, y, width=50, height=50, color = (255, 113, 31)):
+    def __init__(self, x, y, width=40, height=40, color = (255, 113, 31)):
         super().__init__("wall.png", x, y, width, height)
 
-=======
-class Wall(sprite.Sprite):
-    def __init__(self, img, x, y, width, height):
-        super().__init__()
-        self.img = Surface((width, height))
-        self.rect = self.img.get_rect()
-        self.img_width = 50
-        self.img_height = 50
-        self.picture = transform.scale(image.load(img), (50, 50))
-        self.rect = self.img.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.width = width
-        self.height = height
-        
-
-
-    def draw(self):
-        if self.width > self.height:      
-            self.img_width = 0     
-            while self.width > self.img_width:
-                self.img.blit(self.img, (self.img_width, 0))
-                self.img_width += 50
-        window.blit(self.img, self.rect)
->>>>>>> 4b23f12b1c65419f09de62f50edfaa5a967f17e5
 
 
 class Treasure(GameSprite):
     def __init__(self, x, y):
-        super().__init__("treasure.png", x, y, 75, 75)
+        super().__init__("treasure.png", x, y, 50, 50)
 
 
 
@@ -106,24 +81,77 @@ bg = transform.scale(image.load("ground.png"), (WIDTH, HEIGHT))
 player = Player()
 cyborg = Enemy(350, 300)
 
-<<<<<<< HEAD
 
-level = [
-    "WWWWWWWWWWWWWWWWWWWW",
-    "W                  W",
-    "W         WWWWWW   W",
-    "W   WWWW       W   W",
-    "W   W        WWWW  W",
-    "W WWW  WWWW        W",
-    "W   W     W W      W",
-    "W   W     W   WWW WW",
-    "W   WWW WWW   W W  W",
-    "W     W   W   W W  W",
-    "WWW   W   WWWWW W  W",
-    "W W      WW        W",
-    "W W   WWWW   WWW   W",
-    "W     W    T   W   W",
-    "WWWWWWWWWWWWWWWWWWWW",
+
+level1 = [
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "W     W               W",
+    "W            WWWWWW   W",
+    "W   WWWW          W   W",
+    "W   W          WWWW   W",
+    "WWWWW  WWWW           W",
+    "W T W     W W         W",
+    "W   W     W   WWW WW  W",
+    "W   WWW WWW   W W     W",
+    "W     W   W   W W     W",
+    "WWW   W   WWWWW W     W",
+    "W W      WW           W",
+    "W                 WWWWW",
+    "W                 W   W",
+    "WWWWWWWWWWWWWWWWWWWWWWW",
+]
+
+level2 = [
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "W  WWW   WW     WWWWWWWW",
+    "W        WW     W      W",
+    "W        W      WWWW   W",
+    "W                      W",
+    "WWWWWWWWWWWW     WWW   W",
+    "W         WW        WWWW",
+    "W   WWWWWWWWWWWWW      W",
+    "W               W      W",
+    "W    WWWWWWW    W   WWWW",
+    "W      W               W",
+    "W  WWWWWWWWWWWWWWWWWWWWW",
+    "W    WWWW     W   W    W",
+    "W                    T W",
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+]
+
+level3 = [    
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "W                   WWWW",
+    "WW WWWWW       W      WW",
+    "WWW     WWW    W       W",
+    "WWWWWWWWWWWWWWWWWW    WW",
+    "WWWWWWW      WWWWW     W",
+    "WWW              W     W",
+    "W                W   WWW",
+    "W   WWWWWWWWWWW        W",
+    "W   WWW       WWWWWWWWWW",
+    "W   W            WW    W",
+    "W                      W",
+    "WWWWWWWWWWWWWWWWWWWW   W",
+    "W T                    W",
+    "WWWWWWWWWWWWWWWWWWWWWWWW",]
+
+level4 = [
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "W       WWWWW     WWW  W",
+    "WWWW           WWW     W",
+    "WWWWWWWWWWWW           W",
+    "WWW  W      WWWWW   WWWW",
+    "WW                     W",
+    "WW   WW                W",
+    "W      WWWWWWWWWWWWWWWWW",
+    "W       W          WWWWW",
+    "W                      W",
+    "WW    W                W",
+    "WWWWWWWWWWWWWWWWWWWW   W",
+    "W   W      W     W     W",
+    "WT     WW     W        W",
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
 ]
  
 # Parse the level string above. W = wall, E = exit
@@ -131,23 +159,17 @@ x = y = 0
 walls = sprite.Group()
 treasure = Treasure(0, 0)
 
-for row in level:
+for row in level1:
     for col in row:
         if col == "W":           
             walls.add(Wall(x, y))
         if col == "T":
             treasure.rect.x = x
             treasure.rect.y = y
-        x += 50
-    y += 50
+        x += 40
+    y += 40
     x = 0
-=======
-wall1 = Wall("wall.png", 50, 50, 20, 500)
-wall2 = Wall("wall.png", 70, 50, 770, 20)
-wall3 = Wall("wall.png", 300, 70, 20, 150)
-wall4 = Wall("wall.png", 840, 50, 20, 500)
-walls = [wall1, wall2, wall3, wall4]
->>>>>>> 4b23f12b1c65419f09de62f50edfaa5a967f17e5
+
 
 
 mixer.music.load("jungles.ogg")
@@ -193,6 +215,10 @@ while run:
             result = font1.render("YOU WIN", True, (0, 255, 0))
             finish = True
             win_sound.play()
+
+        if sprite.collide_rect(player, cyborg):
+            result = font1.render("YOU LOSE", True, (255, 0, 0))
+            finish = True
 
 
         window.blit(bg, (0,0))
