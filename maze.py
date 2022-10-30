@@ -29,12 +29,8 @@ class GameSprite(sprite.Sprite):
         window.blit(self.image, self.rect)
 
 class Player(GameSprite):
-    def __init__(self):
-<<<<<<< HEAD
-        super().__init__("hero.png", 200, 200, 60, 60)
-=======
-        super().__init__("hero.png", 200, 200, 50, 50)
->>>>>>> 62749850a06a65e1917d19305d38bd2ae1dc4f63
+    def __init__(self, image):
+        super().__init__(image, 200, 200, 60, 60)
         self.speed = 5
         self.hp = 100
 
@@ -51,8 +47,8 @@ class Player(GameSprite):
 
 
 class Enemy(GameSprite):
-    def __init__(self, x, y):
-        super().__init__("cyborg.png", x, y, 75, 75)
+    def __init__(self, image, x, y):
+        super().__init__(image, x, y, 75, 75)
         self.speed = 5
         self.direction = "left"
 
@@ -69,41 +65,74 @@ class Enemy(GameSprite):
 
 
 class Wall(GameSprite):
-    def __init__(self, x, y, width=40, height=40, color = (255, 113, 31)):
-        super().__init__("wall.png", x, y, width, height)
+    def __init__(self, image,  x, y, width=40, height=40, color = (255, 113, 31)):
+        super().__init__(image, x, y, width, height)
 
 
 
 class Treasure(GameSprite):
-    def __init__(self, x, y):
-        super().__init__("treasure.png", x, y, 50, 50)
+    def __init__(self, image, x, y):
+        super().__init__(image, x, y, 50, 50)
 
 
 
 bg = transform.scale(image.load("ground.png"), (WIDTH, HEIGHT))
 
-player = Player()
-cyborg = Enemy(350, 300)
 
 
+player= Player("player1.png")
 
-level1 = [
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
-    "W     W               W",
-    "W            WWWWWW   W",
-    "W   WWWW          W   W",
-    "W   W          WWWW   W",
-    "WWWWW  WWWW           W",
-    "W T W     W W         W",
-    "W   W     W   WWW WW  W",
-    "W   WWW WWW   W W     W",
-    "W     W   W   W W     W",
-    "WWW   W   WWWWW W     W",
-    "W W      WW           W",
-    "W                 WWWWW",
-    "W                 W   W",
-    "WWWWWWWWWWWWWWWWWWWWWWW",
-]
+enemy2 = Enemy("enemy2.png", 350, 300)
+enemy3 = Enemy("enemy3.png", 350, 300)
+enemy4 = Enemy("enemy4.png", 350, 300)
+
+
+enemy =  Enemy("enemy2.png", 350, 300)
+
+
+def new_game(lvl_map, new_player, new_enemy, new_treasure, wall_img, bg_image):   
+    global player, enemy, bg, treasure
+    bg = transform.scale(image.load(bg_image), (WIDTH, HEIGHT))
+    player = new_player
+    enemy = new_enemy
+    treasure = new_treasure
+    x = y = 0
+    for row in lvl_map:
+        for col in row:
+            if col == "W":           
+                walls.add(Wall(wall_img, x, y))
+            if col == "T":
+                treasure.rect.x = x
+                treasure.rect.y = y
+            x += 40
+        y += 40
+        x = 0
+
+def start_level1():
+    enemy1 = Enemy("enemy1.png", 350, 300)
+    player1 = Player("player1.png")
+    treasure1 = Treasure("treasure.png", 0, 0)
+    level1 = [
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+        "W     W               W",
+        "W            WWWWWW   W",
+        "W   WWWW          W   W",
+        "W   W          WWWW   W",
+        "WWWWW  WWWW           W",
+        "W T W     W W         W",
+        "W   W     W   WWW WW  W",
+        "W   WWW WWW   W W     W",
+        "W     W   W   W W     W",
+        "WWW   W   WWWWW W     W",
+        "W W      WW           W",
+        "W                 WWWWW",
+        "W                 W   W",
+        "WWWWWWWWWWWWWWWWWWWWWWW",
+    ]
+
+    new_game(level1, player1, enemy1, treasure1, "wall.png", "floor.jpg")
+
+
 
 level2 = [
     "WWWWWWWWWWWWWWWWWWWWWWWW",
@@ -159,20 +188,11 @@ level4 = [
 ]
  
 # Parse the level string above. W = wall, E = exit
-x = y = 0
-walls = sprite.Group()
-treasure = Treasure(0, 0)
 
-for row in level1:
-    for col in row:
-        if col == "W":           
-            walls.add(Wall(x, y))
-        if col == "T":
-            treasure.rect.x = x
-            treasure.rect.y = y
-        x += 40
-    y += 40
-    x = 0
+walls = sprite.Group()
+treasure = Treasure('treasure.png', 0, 0)
+
+
 
 
 
@@ -195,11 +215,14 @@ def start_game():
     menu.disable()
 
 
+
+
 menu = pygame_menu.Menu("Maze", 400, 300, theme = pygame_menu.themes.THEME_BLUE)
 menu.add.button("Play", start_game)
 menu.add.button("Exit", pygame_menu.events.EXIT)
 menu.mainloop(window)
 
+start_level1()
 
 
 while run:
@@ -213,24 +236,21 @@ while run:
 
     if not finish:
         player.update()
-        cyborg.update()
+        enemy.update()
+
 
         if sprite.collide_rect(player, treasure):
             result = font1.render("YOU WIN", True, (0, 255, 0))
             finish = True
             win_sound.play()
-        if sprite.collide_rect(player, cyborg):
-            result = font1.render("YOU LOSE", True, (255, 0, 0))
-            finish = True
-
-        if sprite.collide_rect(player, cyborg):
+        if sprite.collide_rect(player, enemy):
             result = font1.render("YOU LOSE", True, (255, 0, 0))
             finish = True
 
 
         window.blit(bg, (0,0))
         player.draw()
-        cyborg.draw()
+        enemy.draw()
         walls.draw(window)
         treasure.draw()
     else:
