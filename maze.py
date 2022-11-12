@@ -29,39 +29,92 @@ class GameSprite(sprite.Sprite):
         window.blit(self.image, self.rect)
 
 class Player(GameSprite):
-    def __init__(self, image):
-        super().__init__(image, 200, 200, 60, 60)
-        self.speed = 5
+    def __init__(self, images):
+        super().__init__(images["right"], 200, 200, 40, 40)
+        self.speed = 3
+        self.dir = "R"
         self.hp = 100
+        self.images = {}
+        for direction in images:
+            self.images[direction] = transform.scale(image.load(images[direction]), (40,40))
+        self.image = self.images["right"]
+
 
     def update(self):
         keys = key.get_pressed()
         if keys[K_LEFT] and self.rect.x>0:
+            self.dir = "L"
+            self.image = self.images["left"]
+        elif keys[K_RIGHT] and self.rect.x<WIDTH-self.width:
+            self.dir = "R"
+            self.image = self.images["right"]
+        elif keys[K_UP] and self.rect.y>0:
+            self.dir = "U"
+            self.image = self.images["up"]
+        elif keys[K_DOWN] and self.rect.y<HEIGHT-self.height:
+            self.dir = "D"
+            self.image = self.images["down"]
+
+        else:
+            self.dir = "STOP"
+
+        if self.dir == "L":
             self.rect.x -= self.speed
-        if keys[K_RIGHT] and self.rect.x<WIDTH-self.width:
+        elif self.dir == "R":
             self.rect.x += self.speed
-        if keys[K_UP] and self.rect.y>0:
+        elif self.dir == "U":
             self.rect.y -= self.speed
-        if keys[K_DOWN] and self.rect.y<HEIGHT-self.height:
-            self.rect.y += self.speed
+        elif self.dir == "D":
+            self.rect.y += self.speed   
+
+        collide_list = sprite.spritecollide(self, walls, False)
+        for wall in collide_list:
+            if self.dir == "U":
+                self.rect.y = wall.rect.bottom
+                self.dir = "STOP"
+            elif self.dir == "R":
+                self.rect.right = wall.rect.left
+                self.dir = "STOP" 
+            elif self.dir  == "D":
+                self.rect.bottom = wall.rect.top
+                self.dir = "STOP"
+            elif self.dir == "L":
+                self.rect.left = wall.rect.right
+                self.dir = "STOP"  
+
 
 
 class Enemy(GameSprite):
-    def __init__(self, image, x, y):
-        super().__init__(image, x, y, 75, 75)
-        self.speed = 5
-        self.direction = "left"
+    def __init__(self, images, x, y):
+        super().__init__(images["right"], x, y, 40, 40)
+        self.speed = 3
+        self.direction = "right"
+        self.images = {}
+        for direction in images:
+            self.images[direction] = transform.scale(image.load(images[direction]), (40,40))
+        self.image = self.images["right"]
 
     def update(self):
-        if self.rect.x <= 300:
+        if self.rect.x < 0:
             self.direction = "right"
-        if self.rect.x >= 450:
+        if self.rect.x > 0:
             self.direction = "left"
+
         
         if self.direction == "left":
             self.rect.x -= self.speed
-        else:
+        if self.direction == "right":
             self.rect.x += self.speed
+
+        collide_list = sprite.spritecollide(self, walls, False)
+        for wall in collide_list:            
+            if self.direction == "right":
+                self.rect.right = wall.rect.left
+                self.direction = "left"
+
+            if self.direction == "left":
+                self.rect.left = wall.rect.right
+                self.direction = "right"
 
 
 class Wall(GameSprite):
@@ -72,22 +125,45 @@ class Wall(GameSprite):
 
 class Treasure(GameSprite):
     def __init__(self, image, x, y):
-        super().__init__(image, x, y, 50, 50)
+        super().__init__(image, x, y, 40, 40)
 
 
 
 bg = transform.scale(image.load("ground.png"), (WIDTH, HEIGHT))
 
+dirplayer1 = {"right": "player1 right.png",
+                "left": "player1 left.png",
+                "up": "player1 up.png",
+                "down": "player1.png"}
+
+dirplayer2 = {"right": "player2 right.png",
+                "left": "player2 left.png",
+                "up": "player2 up.png",
+                "down": "player2.png"}
+
+dirplayer3 = {"right": "player3 right.png",
+                "left": "player3 left.png",
+                "up": "player3 up.png",
+                "down": "player3.png"}
+
+dirplayer4 = {"right": "player4 right.png",
+                "left": "player4 left.png",
+                "up": "player4 up.png",
+                "down": "player4.png"}
 
 
-player= Player("player1.png")
 
-enemy2 = Enemy("enemy2.png", 350, 300)
-enemy3 = Enemy("enemy3.png", 350, 300)
-enemy4 = Enemy("enemy4.png", 350, 300)
+direnemy1 = {"right": "enemy1 right.png",
+                "left": "enemy1 left.png"}
 
+direnemy2 = {"right": "enemy2 right.png",
+                "left": "enemy2 left.png"}
 
-enemy =  Enemy("enemy2.png", 350, 300)
+direnemy3 = {"right": "enemy3 right.png",
+                "left": "enemy3 left.png"}
+
+direnemy4 = {"right": "enemy4 right.png",
+                "left": "enemy4 left.png"}
 
 
 def new_game(lvl_map, new_player, new_enemy, new_treasure, wall_img, bg_image):   
@@ -109,8 +185,10 @@ def new_game(lvl_map, new_player, new_enemy, new_treasure, wall_img, bg_image):
         x = 0
 
 def start_level1():
-    enemy1 = Enemy("enemy1.png", 350, 300)
-    player1 = Player("player1.png")
+    global run
+    run = True
+    enemy1 = Enemy(direnemy1, 121, 401)
+    player1 = Player(dirplayer1)
     treasure1 = Treasure("treasure.png", 0, 0)
     level1 = [
         "WWWWWWWWWWWWWWWWWWWWWWWW",
@@ -131,68 +209,95 @@ def start_level1():
     ]
 
     new_game(level1, player1, enemy1, treasure1, "wall.png", "floor.jpg")
+    menu.disable()
 
 
+def start_level2():
+    global run
+    run = True
+    enemy2 = Enemy(direnemy2, 350, 300)
+    player2 = Player(dirplayer2)
+    treasure2 = Treasure("treasure2.png", 0, 0)
+    level2 = [
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+        "W  WWW   WW     WWWWWWWW",
+        "W        WW     W      W",
+        "W        W      WWWW   W",
+        "W                      W",
+        "WWWWWWWWWWWW     WWW   W",
+        "W         WW        WWWW",
+        "W   WWWWWWWWWWWWW      W",
+        "W               W      W",
+        "W    WWWWWWW    W   WWWW",
+        "W      W               W",
+        "W  WWWWWWWWWWWWWWWWWWWWW",
+        "W    WWWW     W   W    W",
+        "W                    T W",
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+    ]
 
-level2 = [
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
-    "W  WWW   WW     WWWWWWWW",
-    "W        WW     W      W",
-    "W        W      WWWW   W",
-    "W                      W",
-    "WWWWWWWWWWWW     WWW   W",
-    "W         WW        WWWW",
-    "W   WWWWWWWWWWWWW      W",
-    "W               W      W",
-    "W    WWWWWWW    W   WWWW",
-    "W      W               W",
-    "W  WWWWWWWWWWWWWWWWWWWWW",
-    "W    WWWW     W   W    W",
-    "W                    T W",
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
-]
+    new_game(level2, player2, enemy2, treasure2, "wall2.png", "floor2.jpg")
+    menu.disable()
 
-level3 = [    
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
-    "W                   WWWW",
-    "WW WWWWW       W      WW",
-    "WWW     WWW    W       W",
-    "WWWWWWWWWWWWWWWWWW    WW",
-    "WWWWWWW      WWWWW     W",
-    "WWW              W     W",
-    "W                W   WWW",
-    "W   WWWWWWWWWWW        W",
-    "W   WWW       WWWWWWWWWW",
-    "W   W            WW    W",
-    "W                      W",
-    "WWWWWWWWWWWWWWWWWWWW   W",
-    "W T                    W",
-    "WWWWWWWWWWWWWWWWWWWWWWWW",]
+def start_level3():
+    global run
+    run = True
+    enemy3 = Enemy(direnemy3, 350, 300)
+    player3 = Player(dirplayer3)
+    treasure3 = Treasure("treasure3.png", 0, 0)
+    level3 = [    
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+        "W                   WWWW",
+        "WW WWWWW       W      WW",
+        "WWW     WWW    W       W",
+        "WWWWWWWWWWWWWWWWWW    WW",
+        "WWWWWWW      WWWWW     W",
+        "WWW              W     W",
+        "W                W   WWW",
+        "W   WWWWWWWWWWW        W",
+        "W   WWW       WWWWWWWWWW",
+        "W   W            WW    W",
+        "W                      W",
+        "WWWWWWWWWWWWWWWWWWWW   W",
+        "W T                    W",
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+    ]
 
-level4 = [
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
-    "W       WWWWW     WWW  W",
-    "WWWW           WWW     W",
-    "WWWWWWWWWWWW           W",
-    "WWW  W      WWWWW   WWWW",
-    "WW                     W",
-    "WW   WW                W",
-    "W      WWWWWWWWWWWWWWWWW",
-    "W       W          WWWWW",
-    "W                      W",
-    "WW    W                W",
-    "WWWWWWWWWWWWWWWWWWWW   W",
-    "W   W      W     W     W",
-    "WT     WW     W        W",
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
-]
+    new_game(level3, player3, enemy3, treasure3, "wall3.png", "floor3.jpg")
+    menu.disable()
+
+def start_level4():
+    global run
+    run = True
+    enemy4 = Enemy(direnemy4, 350, 300)
+    player4 = Player(dirplayer4)
+    treasure4 = Treasure("treasure4.png", 0, 0)
+    level4 = [
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+        "W       WWWWW     WWW  W",
+        "WWWW           WWW     W",
+        "WWWWWWWWWWWW           W",
+        "WWW  W      WWWWW   WWWW",
+        "WW                     W",
+        "WW   WW                W",
+        "W      WWWWWWWWWWWWWWWWW",
+        "W       W          WWWWW",
+        "W                      W",
+        "WW    W                W",
+        "WWWWWWWWWWWWWWWWWWWW   W",
+        "W   W      W     W     W",
+        "WT     WW     W        W",
+        "WWWWWWWWWWWWWWWWWWWWWWWW",
+    ]
+
+    new_game(level4, player4, enemy4, treasure4, "wall4.png", "floor4.jpg")
+    menu.disable()
+
  
 # Parse the level string above. W = wall, E = exit
 
 walls = sprite.Group()
 treasure = Treasure('treasure.png', 0, 0)
-
-
 
 
 
@@ -209,20 +314,19 @@ clock = time.Clock()
 FPS = 60
 finish = False
 
-def start_game():
-    global run
-    run = True
-    menu.disable()
 
 
 
 
 menu = pygame_menu.Menu("Maze", 400, 300, theme = pygame_menu.themes.THEME_BLUE)
-menu.add.button("Play", start_game)
+menu.add.button("Level 1", start_level1)
+menu.add.button("Level 2", start_level2)
+menu.add.button("Level 3", start_level3)
+menu.add.button("Level 4", start_level4)
 menu.add.button("Exit", pygame_menu.events.EXIT)
 menu.mainloop(window)
 
-start_level1()
+
 
 
 while run:
