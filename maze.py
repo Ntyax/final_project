@@ -328,7 +328,7 @@ treasure = Treasure('treasure.png', 0, 0)
 
 
 
-mixer.music.load("jungles.ogg")
+mixer.music.load("Magic Escape Room.mp3")
 mixer.music.set_volume(0.5) #гучність фонової музики
 mixer.music.play()
 
