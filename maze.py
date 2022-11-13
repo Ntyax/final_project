@@ -30,7 +30,7 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self, images):
-        super().__init__(images["right"], 200, 200, 40, 40)
+        super().__init__(images["right"], 70, 100, 40, 40)
         self.speed = 3
         self.dir = "R"
         self.hp = 100
@@ -85,36 +85,55 @@ class Player(GameSprite):
 
 
 class Enemy(GameSprite):
-    def __init__(self, images, x, y):
-        super().__init__(images["right"], x, y, 40, 40)
+    def __init__(self, images, x, y, level = 1):
+        self.dirs = list(images.keys())
+        super().__init__(images[self.dirs[0]], x, y, 40, 40)
         self.speed = 3
-        self.direction = "right"
+        self.level = level
+        self.direction = self.dirs[0]
         self.images = {}
         for direction in images:
             self.images[direction] = transform.scale(image.load(images[direction]), (40,40))
-        self.image = self.images["right"]
+
 
     def update(self):
-        if self.rect.x < 0:
-            self.direction = "right"
-        if self.rect.x > 0:
-            self.direction = "left"
+        if self.level == 1:
+            if self.rect.x >= 350:
+                self.direction = "left"
+                self.image = self.images["left"]
+            elif self.rect.x < 105:
+                self.direction = "right"
+                self.image = self.images["right"]
+
+        if self.level == 2:
+            if self.rect.y >= 400:
+                self.direction = "up"
+            elif self.rect.y < 100:
+                self.direction = "down"
+
+        if self.level == 3:
+            if self.rect.y >= 440:
+                self.direction = "up"
+            elif self.rect.y < 200:
+                self.direction = "down"
+
+        if self.level == 4:
+            if self.rect.y >= 390:
+                self.direction = "up"
+            elif self.rect.y < 170:
+                self.direction = "down"
+
 
         
         if self.direction == "left":
             self.rect.x -= self.speed
-        if self.direction == "right":
+        elif self.direction == "right":
             self.rect.x += self.speed
+        if self.direction == "up":
+            self.rect.y -= self.speed
+        elif self.direction == "down":
+            self.rect.y += self.speed 
 
-        collide_list = sprite.spritecollide(self, walls, False)
-        for wall in collide_list:            
-            if self.direction == "right":
-                self.rect.right = wall.rect.left
-                self.direction = "left"
-
-            if self.direction == "left":
-                self.rect.left = wall.rect.right
-                self.direction = "right"
 
 
 class Wall(GameSprite):
@@ -154,16 +173,24 @@ dirplayer4 = {"right": "player4 right.png",
 
 
 direnemy1 = {"right": "enemy1 right.png",
-                "left": "enemy1 left.png"}
+                "left": "enemy1 left.png",
+                "up": "enemy 1 up.png",
+                "down": "enemy1.png"}
 
 direnemy2 = {"right": "enemy2 right.png",
-                "left": "enemy2 left.png"}
+                "left": "enemy2 left.png",
+                "up": "enemy2 up.png",
+                "down": "enemy2.png"}
 
 direnemy3 = {"right": "enemy3 right.png",
-                "left": "enemy3 left.png"}
+                "left": "enemy3 left.png",
+                "up": "enemy3 up.png",
+                "down": "enemy3.png"}
 
 direnemy4 = {"right": "enemy4 right.png",
-                "left": "enemy4 left.png"}
+                "left": "enemy4 left.png",
+                "up": "enemy4 up.png",
+                "down": "enemy4.png"}
 
 
 def new_game(lvl_map, new_player, new_enemy, new_treasure, wall_img, bg_image):   
@@ -187,7 +214,7 @@ def new_game(lvl_map, new_player, new_enemy, new_treasure, wall_img, bg_image):
 def start_level1():
     global run
     run = True
-    enemy1 = Enemy(direnemy1, 121, 401)
+    enemy1 = Enemy(direnemy1, 121, 401, 1)
     player1 = Player(dirplayer1)
     treasure1 = Treasure("treasure.png", 0, 0)
     level1 = [
@@ -215,7 +242,7 @@ def start_level1():
 def start_level2():
     global run
     run = True
-    enemy2 = Enemy(direnemy2, 350, 300)
+    enemy2 = Enemy(direnemy2, 470, 400, 2)
     player2 = Player(dirplayer2)
     treasure2 = Treasure("treasure2.png", 0, 0)
     level2 = [
@@ -242,14 +269,14 @@ def start_level2():
 def start_level3():
     global run
     run = True
-    enemy3 = Enemy(direnemy3, 350, 300)
+    enemy3 = Enemy(direnemy3, 350, 440, 3)
     player3 = Player(dirplayer3)
     treasure3 = Treasure("treasure3.png", 0, 0)
     level3 = [    
         "WWWWWWWWWWWWWWWWWWWWWWWW",
         "W                   WWWW",
-        "WW WWWWW       W      WW",
-        "WWW     WWW    W       W",
+        "W    WWW       W      WW",
+        "W       WWW    W       W",
         "WWWWWWWWWWWWWWWWWW    WW",
         "WWWWWWW      WWWWW     W",
         "WWW              W     W",
@@ -269,17 +296,17 @@ def start_level3():
 def start_level4():
     global run
     run = True
-    enemy4 = Enemy(direnemy4, 350, 300)
+    enemy4 = Enemy(direnemy4, 160, 390, 4)
     player4 = Player(dirplayer4)
     treasure4 = Treasure("treasure4.png", 0, 0)
     level4 = [
         "WWWWWWWWWWWWWWWWWWWWWWWW",
         "W       WWWWW     WWW  W",
-        "WWWW           WWW     W",
-        "WWWWWWWWWWWW           W",
+        "W              WWW     W",
+        "W  WWWWWWWWW           W",
         "WWW  W      WWWWW   WWWW",
-        "WW                     W",
-        "WW   WW                W",
+        "W                      W",
+        "W    WW                W",
         "W      WWWWWWWWWWWWWWWWW",
         "W       W          WWWWW",
         "W                      W",
